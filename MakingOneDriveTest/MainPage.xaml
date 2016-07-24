@@ -1,0 +1,56 @@
+﻿<Page
+    x:Class="OneDriveAdaptation.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:OneDriveAdaptation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    SizeChanged="MainPage_SizeChanged" >
+
+
+
+    <ScrollViewer Name="MyScrollViewer" >
+
+        <StackPanel Orientation="Vertical"  Name="MainStackPanel" Background="White"  >
+
+            <TextBlock   FontSize="20"    HorizontalAlignment="Center" Text="Utilizing OneDrive for your Apps" />
+            <TextBlock></TextBlock>
+            <RichTextBlock  TextWrapping="WrapWholeWords" HorizontalAlignment="Center"  Margin="20,20,20,20" >
+                <Paragraph >
+                    This is an example, with source code, that enables you to test out how the one drive development kit can be utilized in your app.
+                </Paragraph>
+                <Paragraph></Paragraph>
+
+            </RichTextBlock>
+            <TextBlock TextWrapping="WrapWholeWords"></TextBlock>
+
+            <Button Name="AuthenticationButton" HorizontalAlignment="Center" VerticalAlignment="Top" >Authenticate and get status of OneDrive</Button>
+            <TextBlock  TextAlignment="Center"  Name="status" TextWrapping="WrapWholeWords"></TextBlock>
+            <TextBlock TextAlignment="Center" Name="status2" TextWrapping="WrapWholeWords"></TextBlock>
+            <Button Name="MakeFolder"  IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFolder_Tapped">Make a folder in the Special.AppFolder</Button>
+
+
+            <RichTextBlock  TextAlignment="Center" TextWrapping="WrapWholeWords" HorizontalAlignment="Center"  Margin="20,20,20,20" >
+
+                <Paragraph></Paragraph>
+
+                <Paragraph  >This work is based off of this article
+                    <Hyperlink NavigateUri="https://msdn.microsoft.com/en-us/magazine/mt632271.aspx" >https://msdn.microsoft.com/en-us/magazine/mt632271.aspx</Hyperlink>
+                    and this Stack Overflow post
+                    <Hyperlink NavigateUri="http://stackoverflow.com/questions/37397443/onedrive-api-create-folder-if-not-exist">http://stackoverflow.com/questions/37397443/onedrive-api-create-folder-if-not-exist</Hyperlink>
+                </Paragraph>
+                <Paragraph></Paragraph>
+                <Paragraph>This project's source is available open source at
+                    <Hyperlink NavigateUri="https://github.com/gibbloggen/OneDriveExample" >https://github.com/gibbloggen/OneDriveExample</Hyperlink>
+                </Paragraph>
+                <Paragraph></Paragraph>
+                <Paragraph>Essential Software's Website is
+                    <Hyperlink NavigateUri="http://essentialsoftwareproducts.org" >http://essentialsoftwareproducts.org</Hyperlink>
+                </Paragraph>
+            </RichTextBlock>
+
+        </StackPanel>
+
+    </ScrollViewer>
+</Page>
