@@ -18,7 +18,7 @@
             <TextBlock></TextBlock>
             <RichTextBlock  TextWrapping="WrapWholeWords" HorizontalAlignment="Center"  Margin="20,20,20,20" >
                 <Paragraph >
-                    This is an example, with source code, that enables you to test out how the one drive development kit can be utilized in your app.
+                     This is an example, with source code, that enables you to test out how the one drive development kit can be utilized in your app.
                 </Paragraph>
                 <Paragraph></Paragraph>
 
