@@ -42,9 +42,14 @@ namespace OneDriveAdaptation
     public sealed partial class MainPage : Page
     {
         private IOneDriveClient _client;
+        private string _folderID;
         public MainPage()
         {
             this.InitializeComponent();
+            MakeFolder.Visibility = Visibility.Collapsed;
+            DeleteFolder.Visibility = Visibility.Collapsed;
+
+
             
             AuthenticationButton.Click += async (s, e) =>
             {
@@ -82,7 +87,11 @@ namespace OneDriveAdaptation
                     foreach (var entity in item)
                     {
                         if (entity.Name == "EssentialSoftwareProducts")
-                        { hasFolder = true; }
+                        {
+                            hasFolder = true;
+                            _folderID = entity.Id;
+
+                        }
 
 
 
@@ -96,13 +105,17 @@ namespace OneDriveAdaptation
 
 
 
-                if (hasFolder) status.Text = "The folder already exists, we can go forward";
+                if (hasFolder)
+                {
+                    status.Text = "The folder already exists, we can go forward or delete the folder";
+                    DeleteFolder.Visibility = Visibility.Visible;
+                }
                 else
-                { 
+                {
                     status.Text = "The folder does not exist, you will need to click \"Make Folder\" ";
-                    MakeFolder.IsEnabled = true;
+                    MakeFolder.Visibility = Visibility.Visible;
 
- 
+
                 }
                 // var builder = _client.Drive.Root;
                 //var j = builder.Children;
@@ -194,7 +207,18 @@ namespace OneDriveAdaptation
 
         }
 
-       
+        private async void DeleteFolder_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            // var IsItDeleted = await _client.Drive.Special.AppRoot.Children.Request().Select(_folderID).GetAsync() ;
+            await _client
+              .Drive
+              .Items[_folderID]
+              .Request()
+              .DeleteAsync()
+              ;
+        }
+
+
 
         /*  private async void Driver_Tapped(object sender, TappedRoutedEventArgs e)
           {
