@@ -9,14 +9,14 @@
     SizeChanged="MainPage_SizeChanged" >
 
 
+    <Grid Background="#FF00FF0C" >
 
-    <ScrollViewer Name="MyScrollViewer" >
+        <TextBlock   FontSize="22"   HorizontalAlignment="Center"  Text="Utilizing OneDrive for your Apps" FontWeight="Bold"     />
+        <ScrollViewer Name="MyScrollViewer" VerticalAlignment="Bottom">
 
         <StackPanel Orientation="Vertical"  Background="#FFE8EADC"  Name="MainStackPanel"  >
-            <Grid Background="#FF00FF0C" >
+          
            
-            <TextBlock   FontSize="22"   HorizontalAlignment="Center"  Text="Utilizing OneDrive for your Apps" FontWeight="Bold"     />
-            </Grid>
       
 
             <TextBlock></TextBlock>
@@ -32,30 +32,40 @@
             <Button Name="AuthenticationButton" HorizontalAlignment="Center" VerticalAlignment="Top" >Authenticate and get status of OneDrive</Button>
             <TextBlock  TextAlignment="Center"  Name="status" TextWrapping="WrapWholeWords"></TextBlock>
             <TextBlock TextAlignment="Center" Name="status2" TextWrapping="WrapWholeWords"></TextBlock>
-            <Button Name="MakeFolder"  HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFolder_Tapped">Make a folder in the Special.AppFolder</Button>
-            <Button x:Name="DeleteFolder"  HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFolder_Tapped" Content="Delete The Folder in Special.AppFolder"/>
+            <Button Name="MakeFolder" Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFolder_Tapped">Make a folder in the Special.AppFolder</Button>
+            <Button x:Name="DeleteFolder"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFolder_Tapped" Content="Delete The Folder in Special.AppFolder"/>
+                <RichTextBlock  TextAlignment="Center" TextWrapping="WrapWholeWords" HorizontalAlignment="Center"  Margin="20,20,20,20" >
 
+                    <Paragraph/>
 
-            <RichTextBlock  TextAlignment="Center" TextWrapping="WrapWholeWords" HorizontalAlignment="Center"  Margin="20,20,20,20" >
+                    <Paragraph  >
+                        <Run Text="This work is based off of this article "/>
+                        <Hyperlink NavigateUri="https://msdn.microsoft.com/en-us/magazine/mt632271.aspx" >
+                            <Run Text="https://msdn.microsoft.com/en-us/magazine/mt632271.aspx"/>
+                        </Hyperlink>
+                        <Run Text=" and this Stack Overflow post "/>
+                        <Hyperlink NavigateUri="http://stackoverflow.com/questions/37397443/onedrive-api-create-folder-if-not-exist">
+                            <Run Text="http://stackoverflow.com/questions/37397443/onedrive-api-create-folder-if-not-exist"/>
+                        </Hyperlink>
+                    </Paragraph>
+                    <Paragraph/>
+                    <Paragraph>
+                        <Run Text="This project's source is available open source at "/>
+                        <Hyperlink NavigateUri="https://github.com/gibbloggen/MakingOneDriveTest" >
+                            <Run Text="https://github.com/gibbloggen/MakingOneDriveTest"/>
+                        </Hyperlink>
+                    </Paragraph>
+                    <Paragraph/>
+                    <Paragraph>
+                        <Run Text="Essential Software's Website is "/>
+                        <Hyperlink NavigateUri="http://essentialsoftwareproducts.org" >
+                            <Run Text="http://essentialsoftwareproducts.org"/>
+                        </Hyperlink>
+                    </Paragraph>
+                </RichTextBlock>
 
-                <Paragraph></Paragraph>
-
-                <Paragraph  >This work is based off of this article
-                    <Hyperlink NavigateUri="https://msdn.microsoft.com/en-us/magazine/mt632271.aspx" >https://msdn.microsoft.com/en-us/magazine/mt632271.aspx</Hyperlink>
-                    and this Stack Overflow post
-                    <Hyperlink NavigateUri="http://stackoverflow.com/questions/37397443/onedrive-api-create-folder-if-not-exist">http://stackoverflow.com/questions/37397443/onedrive-api-create-folder-if-not-exist</Hyperlink>
-                </Paragraph>
-                <Paragraph></Paragraph>
-                <Paragraph>This project's source is available open source at
-                    <Hyperlink NavigateUri="https://github.com/gibbloggen/OneDriveExample" >https://github.com/gibbloggen/OneDriveExample</Hyperlink>
-                </Paragraph>
-                <Paragraph></Paragraph>
-                <Paragraph>Essential Software's Website is
-                    <Hyperlink NavigateUri="http://essentialsoftwareproducts.org" >http://essentialsoftwareproducts.org</Hyperlink>
-                </Paragraph>
-            </RichTextBlock>
-           
-        </StackPanel>
+            </StackPanel>
 
     </ScrollViewer>
+    </Grid>
 </Page>

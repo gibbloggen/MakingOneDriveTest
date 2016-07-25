@@ -22,6 +22,7 @@ using Windows.UI.Xaml.Navigation;
 //      Date:   7/16/2016
 //      License: MIT License
 //      References:  Example is an adaptation of the material found here,,,  https://msdn.microsoft.com/en-us/magazine/mt632271.aspx
+//          And this Stack Overflow Post,,, http://stackoverflow.com/questions/37397443/onedrive-api-create-folder-if-not-exist
 //      Company: Essential Software Products  http://essentialsoftwareproducts.org
 //
 
@@ -55,10 +56,10 @@ namespace OneDriveAdaptation
             {
                 var scopes = new[]
                 {
-      "onedrive.readwrite",
-      "onedrive.appfolder",
-      "wl.signin"
-    };
+                    "onedrive.readwrite",
+                    "onedrive.appfolder",
+                    "wl.signin"
+                 };
                 _client = OneDriveClientExtensions.GetClientUsingOnlineIdAuthenticator(
                    scopes);
                 var session = await _client.AuthenticateAsync();
@@ -72,7 +73,7 @@ namespace OneDriveAdaptation
                 IChildrenCollectionPage item = null;
                 try
                 {
-                    // item = await _client.Drive.Special("EssentialSoftwareProducts").Children.Request().GetAsync();
+                    //Checks if approot has children, going to be sprinkling more try and catches around, but this is it for the first release
                     item = await _client.Drive.Special.AppRoot.Children.Request().GetAsync();
                 }
                 catch
@@ -88,6 +89,7 @@ namespace OneDriveAdaptation
                     {
                         if (entity.Name == "EssentialSoftwareProducts")
                         {
+                            //We know the name of the folder, so we are letting the system know they need to offer a delete
                             hasFolder = true;
                             _folderID = entity.Id;
 
@@ -105,7 +107,7 @@ namespace OneDriveAdaptation
 
 
 
-                if (hasFolder)
+                if (hasFolder) 
                 {
                     status.Text = "The folder already exists, we can go forward or delete the folder";
                     DeleteFolder.Visibility = Visibility.Visible;
@@ -117,122 +119,64 @@ namespace OneDriveAdaptation
 
 
                 }
-                // var builder = _client.Drive.Root;
-                //var j = builder.Children;
+                
             };
            
         }
 
 
 
-        /*     private async void MakeFolder_Tapped(object sender, TappedRoutedEventArgs e)
-             {
-                 var newFolder = new Item
-                 {
-                     Name = "EssentialSoftwareProducts",
-                     Folder = new Folder()
-                 };
-                 var newFolderCreated = _client.Drive
-                   //.Special.AppRoot
-                   .Root
-                   .Children
-                   .Request()
-                   .AddAsync(newFolder);
-                 var successDialog = new MessageDialog(
-                   $"The folder has been created in OneDrive\\developer\\apps\\MakeOneDriveTest\\EssentialSoftwareProducts  with folder ID: {newFolderCreated.Id}",
-                   "Done!");
-                 await successDialog.ShowAsync();
-
-
-             }*/
-
         private void MainPage_SizeChanged(object sender, SizeChangedEventArgs e)
         {
 
-            //JL
+            //Adjust heights so that the scroll bars work on the main screen.
+            //It is a bit of a hack, but I have not found a better way to do this yet.
             double j = e.NewSize.Height;
-            if (true)
+            double jj = e.NewSize.Width;
+            if ((j > 500) && (jj < 500))
             {
-              MyScrollViewer.Height = j - 15;
-                MainStackPanel.Height = j + 15;
-               // GroceryStoreToGetList.Height = j - 165;
-               // MyRightMenuSorta.Height = j - 100;
-              //  MySplitView.Height = j - 37;
+                MyScrollViewer.Height = j - 105;
+                MainStackPanel.Height = j - 65;
             }
-            //else MySplitView.Height = 1000;
+            else
+            {
+                MyScrollViewer.Height = j - 35;
+                MainStackPanel.Height = j - 5;
 
-
-            /* SetterBase q = new SetterBase(    ;
-           q.SetValue(GroceryStore.Height., e.NewSize.Height - 145);
-           Phone.Setters.Add("SetterBase item")
-
-           if (e.NewSize.Width > 700)
-           {
-               MySplitView.IsPaneOpen = true;
-
-
-           }
-           else
-           {
-               MySplitView.IsPaneOpen = false;
-
-
-           }*/
-            return;
+            }
+                return;
 
         }
         private async void MakeFolder_Tapped(object sender, TappedRoutedEventArgs e)
         {
             var folderToCreate = new Item { Name = "EssentialSoftwareProducts", Folder = new Folder() };
             var newFolder = await _client.Drive.Special.AppRoot.Children.Request().AddAsync(folderToCreate);
-            // return oldfolder.Id;
+            status.Text = "The Folder has been created, you can now delete it. ";
             status2.Text = "EssentialSoftwareProducts Folder created in App Root with id of: " + newFolder.Id.ToString();
-
-
-
-
-
-
-            
-           // var merde = await _client.Drive.Special.AppRoot.Children.Request().AddAsync(newFolder2);
-
-     /*          
-            var successDialog = new MessageDialog(
-              $"Did it do anything????",
-              "Done!");
-            await successDialog.ShowAsync();
-
-*/
-        
+            _folderID = newFolder.Id;
+            DeleteFolder.Visibility = Visibility.Visible;
+            MakeFolder.Visibility = Visibility.Collapsed;
 
         }
 
         private async void DeleteFolder_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            // var IsItDeleted = await _client.Drive.Special.AppRoot.Children.Request().Select(_folderID).GetAsync() ;
+            
             await _client
               .Drive
               .Items[_folderID]
               .Request()
               .DeleteAsync()
               ;
+            status.Text = "The Folder has been deleted,,,,";
+            status2.Text = "EssentialSoftwareProducts Folder deleted in App Root with id of: " + _folderID;
+
+            DeleteFolder.Visibility = Visibility.Collapsed;
+            MakeFolder.Visibility = Visibility.Visible;
+
+
         }
 
-
-
-        /*  private async void Driver_Tapped(object sender, TappedRoutedEventArgs e)
-          {
-              var scopes = new[]
-           {
-        "onedrive.readwrite",
-        "onedrive.appfolder",
-        "wl.signin"
-      };
-              _client = OneDriveClientExtensions.GetClientUsingOnlineIdAuthenticator(
-                scopes);
-              var session = await _client.AuthenticateAsync();
-              System.Diagnostics.Debug.WriteLine($"Token: {session.AccessToken}");
-          }*/
-
+        
     }
 }
