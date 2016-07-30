@@ -56,72 +56,89 @@ namespace OneDriveAdaptation
             {
                 var scopes = new[]
                 {
-                    "onedrive.readwrite",
-                    "onedrive.appfolder",
-                    "wl.signin"
+                  //  "onedrive.readwrite",  Commented out, this was requesting read/write for all of one drive
+                    "onedrive.appfolder",  //This is the only one I really need to do this demo.
+                    "wl.signin"  //for now I'm keeping this one, it is for automatically signing on from the app, I think this is ok, otherwise will adjut
                  };
                 _client = OneDriveClientExtensions.GetClientUsingOnlineIdAuthenticator(
                    scopes);
-                var session = await _client.AuthenticateAsync();
-                System.Diagnostics.Debug.WriteLine($"Token: {session.AccessToken}");
-                var successDialog = new MessageDialog(
-            $"You have been authenticated with Tocken  {session.AccessToken}",
-            "Authenticated!");
-                await successDialog.ShowAsync();
-                bool hasFolder = false;
-                //folder Status
-                IChildrenCollectionPage item = null;
+                AccountSession session = null;
                 try
                 {
-                    //Checks if approot has children, going to be sprinkling more try and catches around, but this is it for the first release
-                    item = await _client.Drive.Special.AppRoot.Children.Request().GetAsync();
+                    session = await _client.AuthenticateAsync();
                 }
                 catch
                 {
-                    hasFolder = false;
-                }
 
-                if (item.Count == 0) 
-                { hasFolder = false; }
-                else
-                {
-                    foreach (var entity in item)
+                    var failureDialog = new MessageDialog(
+       $"You have not been authenticated, you cannot use this program without being Authenticated.",
+       "Not Authenticated!");
+                    await failureDialog.ShowAsync();
+                    return;
+
+
+                } 
+                    
+                    System.Diagnostics.Debug.WriteLine($"Token: {session.AccessToken}");
+                    var successDialog = new MessageDialog(
+                $"You have been authenticated with Tocken  {session.AccessToken}",
+                "Authenticated!");
+                    await successDialog.ShowAsync();
+                    bool hasFolder = false;
+                    //folder Status
+                    IChildrenCollectionPage item = null;
+                    try
                     {
-                        if (entity.Name == "EssentialSoftwareProducts")
+                        //Checks if approot has children, going to be sprinkling more try and catches around, but this is it for the first release
+                        item = await _client.Drive.Special.AppRoot.Children.Request().GetAsync();
+                    }
+                    catch
+                    {
+                        hasFolder = false;
+                    }
+
+                    if (item.Count == 0)
+                    { hasFolder = false; }
+                    else
+                    {
+                        foreach (var entity in item)
                         {
-                            //We know the name of the folder, so we are letting the system know they need to offer a delete
-                            hasFolder = true;
-                            _folderID = entity.Id;
+                            if (entity.Name == "EssentialSoftwareProducts")
+                            {
+                                //We know the name of the folder, so we are letting the system know they need to offer a delete
+                                hasFolder = true;
+                                _folderID = entity.Id;
+
+                            }
+
+
 
                         }
 
+                    }
+
+                    status.Text = "";
+                    status2.Text = "";
+
+
+
+
+                    if (hasFolder)
+                    {
+                        status.Text = "The folder already exists, we can go forward or delete the folder";
+                        DeleteFolder.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        status.Text = "The folder does not exist, you will need to click \"Make Folder\" ";
+                        MakeFolder.Visibility = Visibility.Visible;
 
 
                     }
-
-                }
-
-               status.Text = "";
-               status2.Text = "";
-
-
-
-
-                if (hasFolder) 
-                {
-                    status.Text = "The folder already exists, we can go forward or delete the folder";
-                    DeleteFolder.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    status.Text = "The folder does not exist, you will need to click \"Make Folder\" ";
-                    MakeFolder.Visibility = Visibility.Visible;
-
-
-                }
                 
-            };
-           
+
+                };
+            
         }
 
 
@@ -161,15 +178,56 @@ namespace OneDriveAdaptation
 
         private async void DeleteFolder_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            
-            await _client
-              .Drive
-              .Items[_folderID]
-              .Request()
-              .DeleteAsync()
-              ;
-            status.Text = "The Folder has been deleted,,,,";
-            status2.Text = "EssentialSoftwareProducts Folder deleted in App Root with id of: " + _folderID;
+
+            bool hasFolder = false;
+            //folder Status
+            IChildrenCollectionPage item = null;
+            try
+            {
+                //Checks if approot has children, going to be sprinkling more try and catches around, but this is it for the first release
+                item = await _client.Drive.Special.AppRoot.Children.Request().GetAsync();
+            }
+            catch
+            {
+                hasFolder = false;
+            }
+
+            if (item.Count == 0)
+            { hasFolder = false; }
+            else
+            {
+                foreach (var entity in item)
+                {
+                    if (entity.Name == "EssentialSoftwareProducts")
+                    {
+                        //We know the name of the folder, so we are letting the system know they need to offer a delete
+                        hasFolder = true;
+                        _folderID = entity.Id;
+
+                    }
+
+
+
+                }
+
+            }
+
+            if (hasFolder)
+            {
+                await _client
+                  .Drive
+                  .Items[_folderID]
+                  .Request()
+                  .DeleteAsync()
+                  ;
+                status.Text = "The Folder has been deleted,,,,";
+                status2.Text = "EssentialSoftwareProducts Folder deleted in App Root with id of: " + _folderID;
+            } else {
+                status.Text = "Folder Not found, cannot delete!";
+                status2.Text = "You can create it again though,,,";
+            }
+
+
 
             DeleteFolder.Visibility = Visibility.Collapsed;
             MakeFolder.Visibility = Visibility.Visible;
