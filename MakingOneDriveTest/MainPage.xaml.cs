@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -44,6 +45,9 @@ namespace OneDriveAdaptation
     {
         private IOneDriveClient _client;
         private string _folderID;
+        private string _fileID;
+        private  Stream contentStream;
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -56,7 +60,7 @@ namespace OneDriveAdaptation
             {
                 var scopes = new[]
                 {
-                  //  "onedrive.readwrite",  Commented out, this was requesting read/write for all of one drive
+                  // "onedrive.readwrite", // Commented out, this was requesting read/write for all of one drive
                     "onedrive.appfolder",  //This is the only one I really need to do this demo.
                     "wl.signin"  //for now I'm keeping this one, it is for automatically signing on from the app, I think this is ok, otherwise will adjut
                  };
@@ -175,6 +179,37 @@ namespace OneDriveAdaptation
             MakeFolder.Visibility = Visibility.Collapsed;
 
         }
+        private async void MakeFile_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
+
+
+
+            StorageFile fileToCreate = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync("Merde.txt", CreationCollisionOption.ReplaceExisting);
+            var z = Windows.Storage.FileIO.WriteTextAsync(fileToCreate, "Swift as a shadow2");
+            //var q = await _client.Drive.Special.AppRoot.ItemWithPath
+            // var file2ToCreate = new Item { Name = "MERDE.TXT", File =  fileToCreate };
+
+            //Windows.Storage.KnownFolders.
+            string q = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\Merde.txt";
+            FileStream g = System.IO.File.Open(q, FileMode.Open);
+
+
+            //The following sequence creates the file on One Drive, 
+            //Many Thanks to ginach  http://stackoverflow.com/questions/33398348/create-app-folder-and-upload-file-using-onedrive-api 
+            var item = await _client
+                .Drive
+                .Special
+                .AppRoot
+                .Children["Merde.txt"]
+                .Content
+                .Request()
+                .PutAsync<Item>(g);
+
+
+           
+
+        }
 
         private async void DeleteFolder_Tapped(object sender, TappedRoutedEventArgs e)
         {
@@ -235,6 +270,13 @@ namespace OneDriveAdaptation
 
         }
 
-        
+    
+
+        private void DeleteFile_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
+        }
     }
+
+
 }
