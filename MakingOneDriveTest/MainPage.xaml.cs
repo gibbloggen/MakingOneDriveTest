@@ -22,8 +22,12 @@ using Windows.UI.Xaml.Navigation;
 //      Author: John Leone, Gibbloggen@outlook.com
 //      Date:   7/16/2016
 //      License: MIT License
+//
+//
 //      References:  Example is an adaptation of the material found here,,,  https://msdn.microsoft.com/en-us/magazine/mt632271.aspx
 //          And this Stack Overflow Post,,, http://stackoverflow.com/questions/37397443/onedrive-api-create-folder-if-not-exist
+//          And this Stack Overflow Post,,,  //Many Thanks to ginach  http://stackoverflow.com/questions/33398348/create-app-folder-and-upload-file-using-onedrive-api 
+//
 //      Company: Essential Software Products  http://essentialsoftwareproducts.org
 //
 
@@ -43,19 +47,32 @@ namespace OneDriveAdaptation
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private IOneDriveClient _client;
-        private string _folderID;
-        private string _fileID;
-        private  Stream contentStream;
+        private IOneDriveClient _client;  //This is the client, that all one drive interactions are based off of.  Comes from MSDN Article
+
+        //These are various one drive id files.  2 for the folders, and two for the files created.
+        private string _folderAppSettingsID;
+        private string _folderPersonalFilesID;
+        private string _fileAppSettingsID;
+        private string _filePersonalFilesID;
+      
+
 
         public MainPage()
         {
             this.InitializeComponent();
-            MakeFolder.Visibility = Visibility.Collapsed;
-            DeleteFolder.Visibility = Visibility.Collapsed;
+
+            //All Buttons on the form are not visible, except for the authentication.  Buttons are only visible, when they can be used.
+            MakeFolderAppSettings.Visibility = Visibility.Collapsed;
+            DeleteFolderAppSettings.Visibility = Visibility.Collapsed;
+            MakeFileAppSettings.Visibility = Visibility.Collapsed;
+            DeleteFileAppSettings.Visibility = Visibility.Collapsed;
+            MakeFolderPersonalFiles.Visibility = Visibility.Collapsed;
+            DeleteFolderPersonalFiles.Visibility = Visibility.Collapsed;
+            MakeFilePersonalFiles.Visibility = Visibility.Collapsed;
+            DeleteFilePersonalFiles.Visibility = Visibility.Collapsed;
 
 
-            
+
             AuthenticationButton.Click += async (s, e) =>
             {
                 var scopes = new[]
@@ -88,9 +105,10 @@ namespace OneDriveAdaptation
                 $"You have been authenticated with Tocken  {session.AccessToken}",
                 "Authenticated!");
                     await successDialog.ShowAsync();
-                    bool hasFolder = false;
-                    //folder Status
-                    IChildrenCollectionPage item = null;
+                bool hasFolderAppSettings = false;
+                bool hasFolderPersonalFiles = false;
+                //folder Status
+                IChildrenCollectionPage item = null;
                     try
                     {
                         //Checks if approot has children, going to be sprinkling more try and catches around, but this is it for the first release
@@ -98,28 +116,39 @@ namespace OneDriveAdaptation
                     }
                     catch
                     {
-                        hasFolder = false;
-                    }
+                    hasFolderAppSettings = false;
+                    hasFolderPersonalFiles = false;
 
-                    if (item.Count == 0)
-                    { hasFolder = false; }
-                    else
+                }
+
+                if (item.Count == 0)
+                {
+                    hasFolderAppSettings = false;
+                    hasFolderPersonalFiles = false;
+                }
+                else
+                {
+                    foreach (var entity in item)
                     {
-                        foreach (var entity in item)
+                        if (entity.Name == "AppSettingsDoNotTouch")
                         {
-                            if (entity.Name == "EssentialSoftwareProducts")
-                            {
-                                //We know the name of the folder, so we are letting the system know they need to offer a delete
-                                hasFolder = true;
-                                _folderID = entity.Id;
+                            //We know the name of the folder, so we are letting the system know they need to offer a delete
+                            hasFolderAppSettings = true;
+                            _folderAppSettingsID = entity.Id;
 
-                            }
-
-
+                        }else if (entity.Name == "PersonalFilesYoursToShare")
+                        {
+                            //We know the name of the folder, so we are letting the system know they need to offer a delete
+                            hasFolderPersonalFiles = true;
+                            _folderPersonalFilesID = entity.Id;
 
                         }
 
+
+
                     }
+
+                }
 
                     status.Text = "";
                     status2.Text = "";
@@ -127,21 +156,34 @@ namespace OneDriveAdaptation
 
 
 
-                    if (hasFolder)
+                    if (hasFolderPersonalFiles)
                     {
-                        status.Text = "The folder already exists, we can go forward or delete the folder";
-                        DeleteFolder.Visibility = Visibility.Visible;
+                        status.Text = "The personal files folder already exists, we can go forward or delete the folder";
+                        DeleteFolderPersonalFiles.Visibility = Visibility.Visible;
                     }
                     else
                     {
-                        status.Text = "The folder does not exist, you will need to click \"Make Folder\" ";
-                        MakeFolder.Visibility = Visibility.Visible;
+                        status.Text = "The personal files folder does not exist, you will need to click \"Make Personal Files Folder\" ";
+                        MakeFolderPersonalFiles.Visibility = Visibility.Visible;
 
 
                     }
-                
 
-                };
+                if (hasFolderAppSettings)
+                {
+                    status2.Text = "The app settings files folder already exists, we can go forward or delete the folder";
+                    DeleteFolderAppSettings.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    status2.Text = "The app settings files folder does not exist, you will need to click \"Make app settings Files Folder\" ";
+                    MakeFolderAppSettings.Visibility = Visibility.Visible;
+
+
+                }
+
+
+            };
             
         }
 
@@ -168,50 +210,21 @@ namespace OneDriveAdaptation
                 return;
 
         }
-        private async void MakeFolder_Tapped(object sender, TappedRoutedEventArgs e)
+      
+        private async void MakeFolderAppSettings_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            var folderToCreate = new Item { Name = "EssentialSoftwareProducts", Folder = new Folder() };
+            var folderToCreate = new Item { Name = "AppSettingsDoNotTouch", Folder = new Folder() };
             var newFolder = await _client.Drive.Special.AppRoot.Children.Request().AddAsync(folderToCreate);
-            status.Text = "The Folder has been created, you can now delete it. ";
-            status2.Text = "EssentialSoftwareProducts Folder created in App Root with id of: " + newFolder.Id.ToString();
-            _folderID = newFolder.Id;
-            DeleteFolder.Visibility = Visibility.Visible;
-            MakeFolder.Visibility = Visibility.Collapsed;
-
-        }
-        private async void MakeFile_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-
-
-
-
-            StorageFile fileToCreate = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync("Merde.txt", CreationCollisionOption.ReplaceExisting);
-            var z = Windows.Storage.FileIO.WriteTextAsync(fileToCreate, "Swift as a shadow2");
-            //var q = await _client.Drive.Special.AppRoot.ItemWithPath
-            // var file2ToCreate = new Item { Name = "MERDE.TXT", File =  fileToCreate };
-
-            //Windows.Storage.KnownFolders.
-            string q = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\Merde.txt";
-            FileStream g = System.IO.File.Open(q, FileMode.Open);
-
-
-            //The following sequence creates the file on One Drive, 
-            //Many Thanks to ginach  http://stackoverflow.com/questions/33398348/create-app-folder-and-upload-file-using-onedrive-api 
-            var item = await _client
-                .Drive
-                .Special
-                .AppRoot
-                .Children["Merde.txt"]
-                .Content
-                .Request()
-                .PutAsync<Item>(g);
-
-
-           
-
+            status.Text = "The App Settings folder has been created. ";
+            //status2.Text = "EssentialSoftwareProducts Folder created in App Root with id of: " + newFolder.Id.ToString();
+            _folderAppSettingsID = newFolder.Id;
+            DeleteFolderAppSettings.Visibility = Visibility.Visible;
+            MakeFolderAppSettings.Visibility = Visibility.Collapsed;
+            MakeFileAppSettings.Visibility = Visibility.Visible;
+            DeleteFileAppSettings.Visibility = Visibility.Collapsed;
         }
 
-        private async void DeleteFolder_Tapped(object sender, TappedRoutedEventArgs e)
+        private async void DeleteFolderAppSettings_Tapped(object sender, TappedRoutedEventArgs e)
         {
 
             bool hasFolder = false;
@@ -233,11 +246,11 @@ namespace OneDriveAdaptation
             {
                 foreach (var entity in item)
                 {
-                    if (entity.Name == "EssentialSoftwareProducts")
+                    if (entity.Name == "AppSettingsDoNotTouch")
                     {
                         //We know the name of the folder, so we are letting the system know they need to offer a delete
                         hasFolder = true;
-                        _folderID = entity.Id;
+                        _folderAppSettingsID = entity.Id;
 
                     }
 
@@ -251,32 +264,209 @@ namespace OneDriveAdaptation
             {
                 await _client
                   .Drive
-                  .Items[_folderID]
+                  .Items[_folderAppSettingsID]
                   .Request()
                   .DeleteAsync()
                   ;
-                status.Text = "The Folder has been deleted,,,,";
-                status2.Text = "EssentialSoftwareProducts Folder deleted in App Root with id of: " + _folderID;
-            } else {
-                status.Text = "Folder Not found, cannot delete!";
-                status2.Text = "You can create it again though,,,";
+                status.Text = "The App Settings Folder has been deleted,,,,";
+               // status2.Text = "EssentialSoftwareProducts Folder deleted in App Root with id of: " + _folderID;
+            }
+            else
+            {
+                status.Text = "App Settings Folder Not found, cannot delete!";
+                //status2.Text = "You can create it again though,,,";
             }
 
 
 
-            DeleteFolder.Visibility = Visibility.Collapsed;
-            MakeFolder.Visibility = Visibility.Visible;
+            DeleteFolderAppSettings.Visibility = Visibility.Collapsed;
+            MakeFolderAppSettings.Visibility = Visibility.Visible;
+            MakeFileAppSettings.Visibility = Visibility.Collapsed;
+            DeleteFileAppSettings.Visibility = Visibility.Collapsed;
+
+        }
+
+        private async void MakeFileAppSettings_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
+
+            StorageFile fileToCreate = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync("AppSettings.txt", CreationCollisionOption.ReplaceExisting);
+           await Windows.Storage.FileIO.WriteTextAsync(fileToCreate, "Setting A");
+            //var q = await _client.Drive.Special.AppRoot.ItemWithPath
+            // var file2ToCreate = new Item { Name = "MERDE.TXT", File =  fileToCreate };
+
+            //Windows.Storage.KnownFolders.
+            string q = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\AppSettings.txt";//"\\AppSettings" + annoying++ + ".txt";
+            FileStream g = System.IO.File.Open(q, FileMode.OpenOrCreate);
+
+
+            //The following sequence creates the file on One Drive, 
+            //Many Thanks to ginach  http://stackoverflow.com/questions/33398348/create-app-folder-and-upload-file-using-onedrive-api 
+            
+            var item = await _client
+                .Drive
+                .Items[_folderAppSettingsID]
+                .Children["AppSettings.txt"]
+                .Content
+                .Request()
+                .PutAsync<Item>(g);
+           // g.Flush();
+            //z.Close();
+
+          // await  fileToCreate.DeleteAsync();
+
+
+            _fileAppSettingsID = item.Id;
+
+            DeleteFileAppSettings.Visibility = Visibility.Visible;
+            MakeFileAppSettings.Visibility = Visibility.Collapsed;
+
+        }
+
+        private async void DeleteFileAppSettings_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            await _client
+                  .Drive
+                  .Items[_fileAppSettingsID]
+                  .Request()
+                  .DeleteAsync();
+
+            MakeFileAppSettings.Visibility = Visibility.Visible;
+            DeleteFileAppSettings.Visibility = Visibility.Collapsed;
+
+        }
+
+        private async void MakeFolderPersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var folderToCreate = new Item { Name = "PersonalFilesYoursToShare", Folder = new Folder() };
+            var newFolder = await _client.Drive.Special.AppRoot.Children.Request().AddAsync(folderToCreate);
+            status.Text = "The Personal Files folder has been created. ";
+            //status2.Text = "EssentialSoftwareProducts Folder created in App Root with id of: " + newFolder.Id.ToString();
+            _folderPersonalFilesID = newFolder.Id;
+            DeleteFolderPersonalFiles.Visibility = Visibility.Visible;
+            MakeFolderPersonalFiles.Visibility = Visibility.Collapsed;
+            MakeFilePersonalFiles.Visibility = Visibility.Visible;
+            DeleteFilePersonalFiles.Visibility = Visibility.Collapsed;
+
+        }
+
+        private async void DeleteFolderPersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
+            bool hasFolder = false;
+            //folder Status
+            IChildrenCollectionPage item = null;
+            try
+            {
+                //Checks if approot has children, going to be sprinkling more try and catches around, but this is it for the first release
+                item = await _client.Drive.Special.AppRoot.Children.Request().GetAsync();
+            }
+            catch
+            {
+                hasFolder = false;
+            }
+
+            if (item.Count == 0)
+            { hasFolder = false; }
+            else
+            {
+                foreach (var entity in item)
+                {
+                    if (entity.Name == "PersonalFilesYoursToShare")
+                    {
+                        //We know the name of the folder, so we are letting the system know they need to offer a delete
+                        hasFolder = true;
+                        _folderPersonalFilesID = entity.Id;
+
+                    }
+
+
+
+                }
+
+            }
+
+            if (hasFolder)
+            {
+                await _client
+                  .Drive
+                  .Items[_folderPersonalFilesID]
+                  .Request()
+                  .DeleteAsync()
+                  ;
+                status.Text = "The Personal Files Folder has been deleted,,,,";
+                // status2.Text = "EssentialSoftwareProducts Folder deleted in App Root with id of: " + _folderID;
+            }
+            else
+            {
+                status.Text = "Personal Files Folder Not found, cannot delete!";
+                //status2.Text = "You can create it again though,,,";
+            }
+
+
+
+            DeleteFolderPersonalFiles.Visibility = Visibility.Collapsed;
+            MakeFolderPersonalFiles.Visibility = Visibility.Visible;
+            DeleteFilePersonalFiles.Visibility = Visibility.Collapsed;
+            MakeFilePersonalFiles.Visibility = Visibility.Collapsed;
 
 
         }
 
-    
-
-        private void DeleteFile_Tapped(object sender, TappedRoutedEventArgs e)
+        private async void MakeFilePersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            StorageFile fileToCreate = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync("PersonalFiles.txt", CreationCollisionOption.ReplaceExisting);
+            await Windows.Storage.FileIO.WriteTextAsync(fileToCreate, "Personal A");
+            //var q = await _client.Drive.Special.AppRoot.ItemWithPath
+            // var file2ToCreate = new Item { Name = "MERDE.TXT", File =  fileToCreate };
+
+            //Windows.Storage.KnownFolders.
+            string q = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\PersonalFiles.txt";
+            FileStream g = System.IO.File.Open(q, FileMode.Open);
+
+
+            //The following sequence creates the file on One Drive, 
+            //Many Thanks to ginach  http://stackoverflow.com/questions/33398348/create-app-folder-and-upload-file-using-onedrive-api 
+
+            var item = await _client
+                .Drive
+                .Items[_folderPersonalFilesID]
+                .Children["PersonalFiles.txt"]
+                .Content
+                .Request()
+                .PutAsync<Item>(g);
+
+
+            await fileToCreate.DeleteAsync();
+           // g.Flush();
+           // z.Close();
+           
+
+
+            //g.Dispose();
+           // g.Flush();
+            _filePersonalFilesID = item.Id;
+            MakeFilePersonalFiles.Visibility = Visibility.Collapsed;
+            DeleteFilePersonalFiles.Visibility = Visibility.Visible;
+
+
+
+        }
+
+        private async void DeleteFilePersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            await _client
+                  .Drive
+                  .Items[_filePersonalFilesID]
+                  .Request()
+                  .DeleteAsync();
+
+            MakeFilePersonalFiles.Visibility = Visibility.Visible;
+            DeleteFilePersonalFiles.Visibility = Visibility.Collapsed;
 
         }
     }
+    }
 
 
-}
+

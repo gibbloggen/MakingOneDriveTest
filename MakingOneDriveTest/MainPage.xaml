@@ -32,10 +32,15 @@
             <Button Name="AuthenticationButton" HorizontalAlignment="Center" VerticalAlignment="Top" >Authenticate and get status of OneDrive</Button>
             <TextBlock  TextAlignment="Center"  Name="status" TextWrapping="WrapWholeWords"></TextBlock>
             <TextBlock TextAlignment="Center" Name="status2" TextWrapping="WrapWholeWords"></TextBlock>
-                <Button Name="MakeFolder" Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFolder_Tapped">Make a folder in the Special.AppFolder</Button>
-                <Button x:Name="DeleteFolder"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFolder_Tapped" Content="Delete The Folder in Special.AppFolder"/>
-                <Button Name="MakeFile" Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFile_Tapped">Make a file in the Special.AppFolder</Button>
-                <Button x:Name="DeleteFile"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFile_Tapped" Content="Delete The File in Special.AppFolder"/>
+                <Button Name="MakeFolderAppSettings" Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFolderAppSettings_Tapped">Make a folder for App Settings</Button>
+                <Button x:Name="DeleteFolderAppSettings"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFolderAppSettings_Tapped" Content="Delete The Folder App Settings"/>
+                <Button Name="MakeFileAppSettings" Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFileAppSettings_Tapped">Make an app settings file</Button>
+                <Button x:Name="DeleteFileAppSettings"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFileAppSettings_Tapped" Content="Delete The app settings file"/>
+            
+                <Button Name="MakeFolderPersonalFiles" Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFolderPersonalFiles_Tapped">Make a folder for personal files</Button>
+                <Button x:Name="DeleteFolderPersonalFiles"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFolderPersonalFiles_Tapped" Content="Delete the personal files folder"/>
+                <Button Name="MakeFilePersonalFiles" Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFilePersonalFiles_Tapped">Make a file in personal files</Button>
+                <Button x:Name="DeleteFilePersonalFiles"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFilePersonalFiles_Tapped" Content="Delete The File in personal files"/>
                 <RichTextBlock  TextAlignment="Center" TextWrapping="WrapWholeWords" HorizontalAlignment="Center"  Margin="20,20,20,20" >
 
                     <Paragraph/>
@@ -65,7 +70,7 @@
                         </Hyperlink>
                     </Paragraph>
                 </RichTextBlock>
-
+                
             </StackPanel>
 
     </ScrollViewer>
