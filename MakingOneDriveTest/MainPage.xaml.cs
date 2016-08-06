@@ -465,6 +465,62 @@ namespace OneDriveAdaptation
             DeleteFilePersonalFiles.Visibility = Visibility.Collapsed;
 
         }
+
+        private async void UpdateAppSettings_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var contentStream = await _client
+                              .Drive
+                              .Items[_fileAppSettingsID]
+                              .Content
+                              .Request()
+                              .GetAsync();
+
+           
+            int r = (int)contentStream.Length;
+            byte[] q = new byte[r];
+
+            await  contentStream.ReadAsync(q, 0, r);
+
+            var str = System.Text.Encoding.ASCII.GetString(q);
+
+            var AppSettingDialog = new MessageDialog(
+"Your app setting is,,,," + str,
+"App Setting");
+            await AppSettingDialog.ShowAsync();
+
+
+            string t = "WTF";
+            if ( str == "Setting A")
+            {
+                t = "Setting B";
+            } else if ( str == "Setting B")
+            { 
+                t = "Setting C";
+            } else if( str == "Setting C")
+            {
+                t = "Setting A";
+            }
+           
+            byte[] z = new byte[(int)t.Length];
+            z = System.Text.Encoding.ASCII.GetBytes(t);
+            System.IO.MemoryStream streamitSoft = new MemoryStream(z);
+           // await streamitSoft.WriteAsync(z, 0, z.Length);
+            ///StreamWriter writeitbaby = new StreamWriter(streamitSoft);
+
+
+            //await writeitbaby.WriteAsync(q);
+
+           
+                var uploadedItem = await _client
+                                             .Drive
+                                             .Items[_fileAppSettingsID]
+                                             .Content
+                                             .Request()
+                                             .PutAsync<Item>(streamitSoft);
+           
+
+
+        }
     }
     }
 
