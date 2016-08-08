@@ -9,7 +9,7 @@
     SizeChanged="MainPage_SizeChanged" >
 
 
-    <Grid Background="#FF00FF0C" Name="MainGrid" >
+    <Grid Background="#FF00FF0C" >
 
         <TextBlock   FontSize="22"   HorizontalAlignment="Center"  Text="Utilizing OneDrive for your Apps" FontWeight="Bold"     />
         <ScrollViewer Name="MyScrollViewer" VerticalAlignment="Bottom">
@@ -44,9 +44,6 @@
                 <Button x:Name="DeleteFolderPersonalFiles"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFolderPersonalFiles_Tapped" Content="Delete the personal files folder"/>
                 <Button Name="MakeFilePersonalFiles" Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFilePersonalFiles_Tapped">Make a file in personal files</Button>
                 <Button x:Name="DeleteFilePersonalFiles"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFilePersonalFiles_Tapped" Content="Delete The File in personal files"/>
-                <Button x:Name="ReadPersonalFiles"  Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="ReadPersonalFiles_Tapped" Content="Read the Personal file"/>
-                <Button x:Name="UpdatePersonalFiles"  Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="UpdatePersonalFiles_Tapped" Content="Update The Personal file"/>
-
                 <RichTextBlock  TextAlignment="Center" TextWrapping="WrapWholeWords" HorizontalAlignment="Center"  Margin="20,20,20,20" >
 
                     <Paragraph/>
