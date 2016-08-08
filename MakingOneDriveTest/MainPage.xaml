@@ -36,7 +36,8 @@
                 <Button x:Name="DeleteFolderAppSettings"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFolderAppSettings_Tapped" Content="Delete The Folder App Settings"/>
                 <Button Name="MakeFileAppSettings" Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFileAppSettings_Tapped">Make an app settings file</Button>
                 <Button x:Name="DeleteFileAppSettings"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="DeleteFileAppSettings_Tapped" Content="Delete The app settings file"/>
-                <Button x:Name="UpdateAppSettings"  Background="#FFD44949" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="UpdateAppSettings_Tapped" Content="Update The app settings file"/>
+                <Button x:Name="ReadAppSettings"  Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="ReadAppSettings_Tapped" Content="Read the app setting file"/>
+                <Button x:Name="UpdateAppSettings"  Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="UpdateAppSettings_Tapped" Content="Update The app settings file"/>
 
 
                 <Button Name="MakeFolderPersonalFiles" Background="Aquamarine" HorizontalAlignment="Center" VerticalAlignment="Top" Tapped="MakeFolderPersonalFiles_Tapped">Make a folder for personal files</Button>
