@@ -117,16 +117,22 @@ namespace OneDriveAdaptation
             double jj = e.NewSize.Width;
             if ((j > 500) && (jj < 500))
             {
-                MyScrollViewer.Height = j - 105;
-                MainStackPanel.Height = j - 65;
+                MyScrollViewer.Height = j - 35;
+                MainStackPanel.Height = j + 75;
+            }
+            else if ((j < 500) && (jj > 500))
+            {
+                MyScrollViewer.Height = j - 35;
+                MainStackPanel.Height = jj + 75;
+
             }
             else
             {
                 MyScrollViewer.Height = j - 35;
-                MainStackPanel.Height = j - 5;
+                MainStackPanel.Height = j + 75;
 
             }
-            return;
+                return;
 
         }
 
@@ -140,7 +146,15 @@ namespace OneDriveAdaptation
                 status.Text = "The App Settings folder has been created. ";
                 //status2.Text = "EssentialSoftwareProducts Folder created in App Root with id of: " + newFolder.Id.ToString();
                 _folderAppSettingsID = newFolder.Id;
-                MakeFileAppSettings.Visibility = Visibility.Visible;
+                MakeFileAppSettings.IsEnabled = true;
+                MakeFolderAppSettings.IsEnabled = false;
+                DeleteFolderAppSettings.IsEnabled = true;
+            }
+            else
+            {
+                MakeFileAppSettings.IsEnabled = true;
+                MakeFolderAppSettings.IsEnabled = false;
+                DeleteFolderAppSettings.IsEnabled = true;
             }
            // await WhatButtons();
 
@@ -192,15 +206,23 @@ namespace OneDriveAdaptation
                   .DeleteAsync()
                   ;
                 status.Text = "The App Settings Folder has been deleted,,,,";
-                ReadAppSettings.Visibility = Visibility.Collapsed;
-                UpdateAppSettings.Visibility = Visibility.Collapsed;
-                MakeFileAppSettings.Visibility = Visibility.Collapsed;
-                DeleteFileAppSettings.Visibility = Visibility.Collapsed;
+                ReadAppSettings.IsEnabled = false;
+                UpdateAppSettings.IsEnabled = false;
+                MakeFileAppSettings.IsEnabled = false;
+                DeleteFileAppSettings.IsEnabled = false;
+                DeleteFolderAppSettings.IsEnabled = false;
+                MakeFolderAppSettings.IsEnabled = true;
                 // status2.Text = "EssentialSoftwareProducts Folder deleted in App Root with id of: " + _folderID;
             }
             else
             {
                 status.Text = "App Settings Folder Not found, cannot delete!";
+                ReadAppSettings.IsEnabled = false;
+                  DeleteFolderAppSettings.IsEnabled = false;
+                UpdateAppSettings.IsEnabled = false;
+                MakeFileAppSettings.IsEnabled = false;
+                DeleteFileAppSettings.IsEnabled = false;
+                MakeFolderAppSettings.IsEnabled = true;
                 //status2.Text = "You can create it again though,,,";
             }
 
@@ -241,9 +263,10 @@ namespace OneDriveAdaptation
 
 
                 _fileAppSettingsID = item.Id;
-                DeleteFileAppSettings.Visibility = Visibility.Visible;
-                UpdateAppSettings.Visibility = Visibility.Visible;
-                ReadAppSettings.Visibility = Visibility.Visible;
+                DeleteFileAppSettings.IsEnabled = true;
+                UpdateAppSettings.IsEnabled = true;
+                ReadAppSettings.IsEnabled = true;
+                MakeFileAppSettings.IsEnabled = false;
 
             }
 
@@ -261,12 +284,16 @@ namespace OneDriveAdaptation
                       .Items[_fileAppSettingsID]
                       .Request()
                       .DeleteAsync();
-                DeleteFileAppSettings.Visibility = Visibility.Collapsed;
-                MakeFileAppSettings.Visibility = Visibility.Visible;
+                DeleteFileAppSettings.IsEnabled = false;
+                MakeFileAppSettings.IsEnabled = true;
+                UpdateAppSettings.IsEnabled = false;
+                ReadAppSettings.IsEnabled = false;
             } else
             {
-                DeleteFileAppSettings.Visibility = Visibility.Visible;
-                MakeFileAppSettings.Visibility = Visibility.Collapsed;
+                DeleteFileAppSettings.IsEnabled = false;
+                MakeFileAppSettings.IsEnabled = true;
+                UpdateAppSettings.IsEnabled = false;
+                ReadAppSettings.IsEnabled = false;
 
             }
             //await WhatButtons();
@@ -282,9 +309,20 @@ namespace OneDriveAdaptation
                 status.Text = "The Personal Files folder has been created. ";
                 //status2.Text = "EssentialSoftwareProducts Folder created in App Root with id of: " + newFolder.Id.ToString();
                 _folderPersonalFilesID = newFolder.Id;
+                MakeFolderPersonalFiles.IsEnabled = false;
+                DeleteFolderPersonalFiles.IsEnabled = true;
+                DeleteFilePersonalFiles.IsEnabled =false;
+                MakeFilePersonalFiles.IsEnabled = true;
+
+            } else
+            {
+                MakeFolderPersonalFiles.IsEnabled = false;
+                DeleteFolderPersonalFiles.IsEnabled = true;
+                DeleteFilePersonalFiles.IsEnabled = false;
+                MakeFilePersonalFiles.IsEnabled = true;
 
             }
-            await WhatButtons();
+            // await WhatButtons();
         }
 
         private async void DeleteFolderPersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
@@ -375,8 +413,15 @@ namespace OneDriveAdaptation
 
                 await fileToCreate.DeleteAsync();
 
+                DeleteFilePersonalFiles.IsEnabled = true;
+                MakeFilePersonalFiles.IsEnabled = false;
+
+            }else
+            {
+                DeleteFilePersonalFiles.IsEnabled = false;
+                MakeFilePersonalFiles.IsEnabled = true;
             }
-            await WhatButtons();
+           // await WhatButtons();
         }
 
         private async void DeleteFilePersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
@@ -389,8 +434,14 @@ namespace OneDriveAdaptation
                       .Items[_filePersonalFilesID]
                       .Request()
                       .DeleteAsync();
+                DeleteFilePersonalFiles.IsEnabled = false;
+                MakeFilePersonalFiles.IsEnabled =true;
+            } else
+            {
+                DeleteFilePersonalFiles.IsEnabled = true;
+                MakeFilePersonalFiles.IsEnabled = false;
             }
-            await WhatButtons();
+           // await WhatButtons();
 
         }
 
@@ -489,16 +540,16 @@ namespace OneDriveAdaptation
         }
         private void Collapse_All()
         {
-            MakeFolderAppSettings.Visibility = Visibility.Collapsed;
-            DeleteFolderAppSettings.Visibility = Visibility.Collapsed;
-            MakeFileAppSettings.Visibility = Visibility.Collapsed;
-            DeleteFileAppSettings.Visibility = Visibility.Collapsed;
-            MakeFolderPersonalFiles.Visibility = Visibility.Collapsed;
-            DeleteFolderPersonalFiles.Visibility = Visibility.Collapsed;
-            MakeFilePersonalFiles.Visibility = Visibility.Collapsed;
-            DeleteFilePersonalFiles.Visibility = Visibility.Collapsed;
-            ReadAppSettings.Visibility = Visibility.Collapsed;
-            UpdateAppSettings.Visibility = Visibility.Collapsed;
+            MakeFolderAppSettings.IsEnabled = false;
+            DeleteFolderAppSettings.IsEnabled = false;
+            MakeFileAppSettings.IsEnabled = false;
+            DeleteFileAppSettings.IsEnabled = false;
+            MakeFolderPersonalFiles.IsEnabled = false;
+            DeleteFolderPersonalFiles.IsEnabled = false;
+            MakeFilePersonalFiles.IsEnabled = false;
+            DeleteFilePersonalFiles.IsEnabled = false;
+            ReadAppSettings.IsEnabled = false;
+            UpdateAppSettings.IsEnabled = false;
 
 
         }
@@ -541,7 +592,7 @@ namespace OneDriveAdaptation
                         //We know the name of the folder, so we are letting the system know they need to offer a delete
                         hasFolderAppSettings = true;
                         _folderAppSettingsID = entity.Id;
-                        DeleteFolderAppSettings.Visibility = Visibility.Visible;
+                        DeleteFolderAppSettings.IsEnabled = true;
 
                     }
                     else if (entity.Name == "PersonalFilesYoursToShare")
@@ -549,7 +600,7 @@ namespace OneDriveAdaptation
                         //We know the name of the folder, so we are letting the system know they need to offer a delete
                         hasFolderPersonalFiles = true;
                         _folderPersonalFilesID = entity.Id;
-                        DeleteFolderPersonalFiles.Visibility = Visibility.Visible;
+                        DeleteFolderPersonalFiles.IsEnabled = true;
 
                     }
 
@@ -599,11 +650,12 @@ namespace OneDriveAdaptation
                             if (entity.Name == "AppSettings.txt")
                             {
                                 //We know the name of the folder, so we are letting the system know they need to offer a delete
-                                DeleteFileAppSettings.Visibility = Visibility.Visible;
-                                UpdateAppSettings.Visibility = Visibility.Visible;
-                                ReadAppSettings.Visibility = Visibility.Visible;
+                                DeleteFileAppSettings.IsEnabled = true;
+                                UpdateAppSettings.IsEnabled = true;
+                                ReadAppSettings.IsEnabled = true;
                                 _fileAppSettingsID = entity.Id;
                                 hasAppChildren = true;
+                                
 
                             }
 
@@ -613,10 +665,10 @@ namespace OneDriveAdaptation
                     {
 
 
-                        DeleteFileAppSettings.Visibility = Visibility.Collapsed;
-                        UpdateAppSettings.Visibility = Visibility.Collapsed;
-                        ReadAppSettings.Visibility = Visibility.Collapsed;
-                        MakeFileAppSettings.Visibility = Visibility.Visible;
+                        DeleteFileAppSettings.IsEnabled = false;
+                        UpdateAppSettings.IsEnabled = false;
+                        ReadAppSettings.IsEnabled = false;
+                        MakeFileAppSettings.IsEnabled = true;
                         _fileAppSettingsID = "none";
 
 
@@ -627,10 +679,10 @@ namespace OneDriveAdaptation
                 {
 
 
-                    DeleteFileAppSettings.Visibility = Visibility.Collapsed;
-                    UpdateAppSettings.Visibility = Visibility.Collapsed;
-                    ReadAppSettings.Visibility = Visibility.Collapsed;
-                    MakeFileAppSettings.Visibility = Visibility.Visible;
+                    DeleteFileAppSettings.IsEnabled = false;
+                    UpdateAppSettings.IsEnabled = false;
+                    ReadAppSettings.IsEnabled = false;
+                    MakeFileAppSettings.IsEnabled = true;
                     _fileAppSettingsID = "none";
 
 
@@ -645,10 +697,10 @@ namespace OneDriveAdaptation
             else
             {
                 //status.Text = "The personal files folder does not exist, you will need to click \"Make Personal Files Folder\" ";
-                MakeFolderAppSettings.Visibility = Visibility.Visible;
-                DeleteFileAppSettings.Visibility = Visibility.Collapsed;
-                MakeFileAppSettings.Visibility = Visibility.Collapsed;
-                DeleteFolderAppSettings.Visibility = Visibility.Collapsed;
+                MakeFolderAppSettings.IsEnabled = true;
+                DeleteFileAppSettings.IsEnabled = false;
+                MakeFileAppSettings.IsEnabled = false;
+                DeleteFolderAppSettings.IsEnabled = false;
                 _fileAppSettingsID = "none";
                 _folderAppSettingsID = "none";
 
@@ -693,7 +745,7 @@ namespace OneDriveAdaptation
                             if (entity.Name == "PeronsalSettings.txt")
                             {
                                 //We know the name of the folder, so we are letting the system know they need to offer a delete
-                                DeleteFilePersonalFiles.Visibility = Visibility.Visible;
+                                DeleteFilePersonalFiles.IsEnabled = true;
                                 _filePersonalFilesID = entity.Id;
                                 hasPersonalChildren = true;
 
@@ -706,8 +758,8 @@ namespace OneDriveAdaptation
                 {
 
 
-                    DeleteFilePersonalFiles.Visibility = Visibility.Collapsed;
-                    MakeFilePersonalFiles.Visibility = Visibility.Visible;
+                    DeleteFilePersonalFiles.IsEnabled = false;
+                    MakeFilePersonalFiles.IsEnabled = true;
                     _filePersonalFilesID = "none";
 
 
@@ -722,7 +774,7 @@ namespace OneDriveAdaptation
             else
             {
                 //status.Text = "The personal files folder does not exist, you will need to click \"Make Personal Files Folder\" ";
-                MakeFolderPersonalFiles.Visibility = Visibility.Visible;
+                MakeFolderPersonalFiles.IsEnabled = true;
                 _filePersonalFilesID = "none";
 
 
