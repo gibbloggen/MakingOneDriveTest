@@ -118,12 +118,14 @@ namespace OneDriveAdaptation
             if ((j > 500) && (jj < 500))
             {
                 MyScrollViewer.Height = j - 35;
-                MainStackPanel.Height = j + 75;
+                MainGrid.Height = j;
+                MainStackPanel.Height = j + 125;
             }
             else if ((j < 500) && (jj > 500))
             {
                 MyScrollViewer.Height = j - 35;
-                MainStackPanel.Height = jj + 75;
+                MainStackPanel.Height = jj + 125;
+                MainGrid.Height = j;
 
             }
             else
@@ -269,9 +271,17 @@ namespace OneDriveAdaptation
                 MakeFileAppSettings.IsEnabled = false;
 
             }
+            else
+            {
+                DeleteFileAppSettings.IsEnabled = true;
+                UpdateAppSettings.IsEnabled = true;
+                ReadAppSettings.IsEnabled = true;
+                MakeFileAppSettings.IsEnabled = false;
 
-           // await WhatButtons();
-//
+            }
+
+            // await WhatButtons();
+            //
         }
 
         private async void DeleteFileAppSettings_Tapped(object sender, TappedRoutedEventArgs e)
@@ -415,11 +425,19 @@ namespace OneDriveAdaptation
 
                 DeleteFilePersonalFiles.IsEnabled = true;
                 MakeFilePersonalFiles.IsEnabled = false;
+                _filePersonalFilesID = item.Id;
+                UpdatePersonalFiles.IsEnabled = true;
+                ReadPersonalFiles.IsEnabled = true;
+                
 
-            }else
+
+            }
+            else
             {
-                DeleteFilePersonalFiles.IsEnabled = false;
-                MakeFilePersonalFiles.IsEnabled = true;
+                DeleteFilePersonalFiles.IsEnabled = true;
+                MakeFilePersonalFiles.IsEnabled = false;
+                UpdatePersonalFiles.IsEnabled = true;
+                ReadPersonalFiles.IsEnabled = true;
             }
            // await WhatButtons();
         }
@@ -436,10 +454,17 @@ namespace OneDriveAdaptation
                       .DeleteAsync();
                 DeleteFilePersonalFiles.IsEnabled = false;
                 MakeFilePersonalFiles.IsEnabled =true;
-            } else
+                UpdatePersonalFiles.IsEnabled = false;
+                ReadPersonalFiles.IsEnabled = false;
+
+            }
+            else
             {
-                DeleteFilePersonalFiles.IsEnabled = true;
-                MakeFilePersonalFiles.IsEnabled = false;
+                DeleteFilePersonalFiles.IsEnabled = false;
+                MakeFilePersonalFiles.IsEnabled = true;
+                UpdatePersonalFiles.IsEnabled = false;
+                ReadPersonalFiles.IsEnabled = false;
+
             }
            // await WhatButtons();
 
@@ -550,6 +575,8 @@ namespace OneDriveAdaptation
             DeleteFilePersonalFiles.IsEnabled = false;
             ReadAppSettings.IsEnabled = false;
             UpdateAppSettings.IsEnabled = false;
+            ReadPersonalFiles.IsEnabled = false;
+            UpdatePersonalFiles.IsEnabled = false;
 
 
         }
@@ -601,6 +628,7 @@ namespace OneDriveAdaptation
                         hasFolderPersonalFiles = true;
                         _folderPersonalFilesID = entity.Id;
                         DeleteFolderPersonalFiles.IsEnabled = true;
+                       
 
                     }
 
@@ -723,7 +751,7 @@ namespace OneDriveAdaptation
                 {
                     PersonalChildren = await _client
                                                  .Drive
-                                                 .Items[_folderAppSettingsID]
+                                                 .Items[_folderPersonalFilesID]
                                                  .Children
                                                  .Request()
                                                  .GetAsync();
@@ -742,16 +770,33 @@ namespace OneDriveAdaptation
                     {
                         foreach (var entity in PersonalChildren)
                         {
-                            if (entity.Name == "PeronsalSettings.txt")
+                            if (entity.Name == "PersonalFiles.txt")
                             {
                                 //We know the name of the folder, so we are letting the system know they need to offer a delete
                                 DeleteFilePersonalFiles.IsEnabled = true;
+                                UpdatePersonalFiles.IsEnabled = true;
+                                ReadPersonalFiles.IsEnabled = true;
                                 _filePersonalFilesID = entity.Id;
                                 hasPersonalChildren = true;
+                                MakeFilePersonalFiles.IsEnabled = false;
+
+
+
 
                             }
 
                         }
+                    }
+                    else
+                    {
+
+                        DeleteFilePersonalFiles.IsEnabled = false;
+                        MakeFilePersonalFiles.IsEnabled = true;
+                        UpdatePersonalFiles.IsEnabled = false;
+                        ReadPersonalFiles.IsEnabled = false;
+
+                        
+
                     }
                 }
                 else
@@ -760,7 +805,10 @@ namespace OneDriveAdaptation
 
                     DeleteFilePersonalFiles.IsEnabled = false;
                     MakeFilePersonalFiles.IsEnabled = true;
-                    _filePersonalFilesID = "none";
+                    UpdatePersonalFiles.IsEnabled = false;
+                    ReadPersonalFiles.IsEnabled = false;
+
+                   
 
 
 
@@ -775,14 +823,111 @@ namespace OneDriveAdaptation
             {
                 //status.Text = "The personal files folder does not exist, you will need to click \"Make Personal Files Folder\" ";
                 MakeFolderPersonalFiles.IsEnabled = true;
-                _filePersonalFilesID = "none";
-
+                 DeleteFilePersonalFiles.IsEnabled = false;
+                MakeFilePersonalFiles.IsEnabled = false;
+                DeleteFolderPersonalFiles.IsEnabled = false;
+                ReadPersonalFiles.IsEnabled = false;
+                
 
 
 
 
             }
             return 1;
+
+
+        }
+
+        private async void ReadPersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            await WhatButtons();
+            if (_filePersonalFilesID != "none")
+            {
+                var contentStream = await _client
+                                  .Drive
+                                  .Items[_filePersonalFilesID]
+                                  .Content
+                                  .Request()
+                                  .GetAsync();
+
+
+                int r = (int)contentStream.Length;
+                byte[] q = new byte[r];
+
+                await contentStream.ReadAsync(q, 0, r);
+
+                var str = System.Text.Encoding.ASCII.GetString(q);
+
+                var PersonalFilesDialog = new MessageDialog(
+    "Your Personal Files content is,,,," + str,
+    "App Setting");
+                await PersonalFilesDialog.ShowAsync();
+
+            }
+            // await WhatButtons();
+
+        }
+
+        private async void UpdatePersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            await WhatButtons();
+
+            if (_fileAppSettingsID != "none")
+            {
+                var contentStream = await _client
+                               .Drive
+                               .Items[_filePersonalFilesID]
+                               .Content
+                               .Request()
+                               .GetAsync();
+
+
+                int r = (int)contentStream.Length;
+                byte[] q = new byte[r];
+
+                await contentStream.ReadAsync(q, 0, r);
+
+                var str = System.Text.Encoding.ASCII.GetString(q);
+
+
+                string t = "WTF";
+                if (str == "Personal A")
+                {
+                    t = "Personal B";
+                }
+                else if (str == "Personal B")
+                {
+                    t = "Personal C";
+                }
+                else if (str == "Personal C")
+                {
+                    t = "Personal A";
+                }
+
+                byte[] z = new byte[(int)t.Length];
+                z = System.Text.Encoding.ASCII.GetBytes(t);
+                System.IO.MemoryStream streamitSoft = new MemoryStream(z);
+                // await streamitSoft.WriteAsync(z, 0, z.Length);
+                ///StreamWriter writeitbaby = new StreamWriter(streamitSoft);
+
+
+                //await writeitbaby.WriteAsync(q);
+
+
+                var uploadedItem = await _client
+                                             .Drive
+                                             .Items[_filePersonalFilesID]
+                                             .Content
+                                             .Request()
+                                             .PutAsync<Item>(streamitSoft);
+
+
+
+                var PersonalFilesDialog = new MessageDialog(
+    "Your Personal File has been changed to,,,," + t,
+    "App Setting");
+                await PersonalFilesDialog.ShowAsync();
+            }
 
 
         }
