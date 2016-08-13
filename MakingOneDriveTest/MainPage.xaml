@@ -11,7 +11,7 @@
 
     <Grid Background="#FF00FF0C" Name="MainGrid" >
 
-        <TextBlock   FontSize="22"   HorizontalAlignment="Center"  Text="Utilizing OneDrive for your Apps" FontWeight="Bold"     />
+        <TextBlock   FontSize="22"   HorizontalAlignment="Center"  Text="Making One Drive Test -> An Informational Tutorial" FontWeight="Bold"     />
         <ScrollViewer Name="MyScrollViewer" VerticalAlignment="Bottom">
 
             <StackPanel Orientation="Vertical"  Background="#FFE8EADC"  Name="MainStackPanel"  >
@@ -20,11 +20,23 @@
 
 
                 <TextBlock></TextBlock>
-                <RichTextBlock  TextWrapping="WrapWholeWords" HorizontalAlignment="Center"  Margin="20,20,20,20" >
+                <RichTextBlock  TextWrapping="WrapWholeWords" TextAlignment="Center"  Margin="50,20,50,20" >
                     <Paragraph >
-                        This is an example, with source code, that enables you to test out how the one drive development kit can be utilized in your app.
+                        The purpose of this app is to show a working example of how to utilize the OneDrive SDK in a C# Windows Store App. This is for informational purposes and/or tutorial.
                     </Paragraph>
-                    <Paragraph></Paragraph>
+                    <Paragraph>
+                        To see a demonstration of what this does, you can look at the following video,,,
+                        <Hyperlink NavigateUri="https://youtu.be/VJ-uV7X6Hqg" >
+                            <Run Text="https://youtu.be/VJ-uV7X6Hqg"/>
+                        </Hyperlink>
+                        In order to see this in operation, you need to click the Authenticate Button, and give the app rights, these can be revoked at,,,
+
+                        <Hyperlink NavigateUri="https://account.live.com/consent/Manage" >
+                            <Run Text="https://account.live.com/consent/Manage"/>
+                        </Hyperlink> When you are done working with this app.
+
+                       
+                    </Paragraph>
 
                 </RichTextBlock>
                 <TextBlock TextWrapping="WrapWholeWords"></TextBlock>

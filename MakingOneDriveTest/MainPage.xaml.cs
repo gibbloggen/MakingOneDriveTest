@@ -29,7 +29,7 @@ using Windows.UI.Xaml.Navigation;
 //          And this Stack Overflow Post,,, http://stackoverflow.com/questions/37397443/onedrive-api-create-folder-if-not-exist
 //          And this Stack Overflow Post,,,  //Many Thanks to ginach  http://stackoverflow.com/questions/33398348/create-app-folder-and-upload-file-using-onedrive-api 
 //
-//      Company: Essential Software Products  http://essentialsoftwareproducts.org
+//      Company To Be Created: Essential Software Products  http://essentialsoftwareproducts.org
 //
 
 //The MIT License(MIT)
@@ -63,7 +63,7 @@ namespace OneDriveAdaptation
             this.InitializeComponent();
 
             //All Buttons on the form are not visible, except for the authentication.  Buttons are only visible, when they can be used.
-            Collapse_All();
+            Collapse_All();  
 
 
 
@@ -72,7 +72,7 @@ namespace OneDriveAdaptation
             {
                 var scopes = new[]
                 {
-                    "onedrive.readwrite", // Commented out, this was requesting read/write for all of one drive
+                    "onedrive.readwrite", // Commented out, thinking this was too much clearance, actually, it requires this much clearance.
                     "onedrive.appfolder",  //This is the only one I really need to do this demo.
                     "wl.signin"  //for now I'm keeping this one, it is for automatically signing on from the app, I think this is ok, otherwise will adjut
                  };
@@ -86,6 +86,7 @@ namespace OneDriveAdaptation
                 }
                 catch
                 {
+                    //this catch will happen if they deny the app rights.
 
                     var failureDialog = new MessageDialog(
        $"You have not been authenticated, you cannot use this program without being Authenticated.",
@@ -95,6 +96,7 @@ namespace OneDriveAdaptation
 
 
                 }
+                //This will happen if they approve rights.  They only have to approve them the first time.
 
                 System.Diagnostics.Debug.WriteLine($"Token: {session.AccessToken}");
                 var successDialog = new MessageDialog(
@@ -120,19 +122,19 @@ namespace OneDriveAdaptation
             {
                 MyScrollViewer.Height = j - 35;
                 MainGrid.Height = j;
-                MainStackPanel.Height = j + 375;
+                MainStackPanel.Height = j + 425;
             }
             else if ((j < 500) && (jj > 500))
             {
                 MyScrollViewer.Height = j - 35;
-                MainStackPanel.Height = jj + 375;
+                MainStackPanel.Height = jj + 425;
                 MainGrid.Height = j;
 
             }
             else
             {
                 MyScrollViewer.Height = j - 35;
-                MainStackPanel.Height = j + 225;
+                MainStackPanel.Height = j + 275;
                 MainGrid.Height = j;
 
             }
@@ -142,6 +144,9 @@ namespace OneDriveAdaptation
 
         private async void MakeFolderAppSettings_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            //this whatbuttons method is for multi-user synching.  It confirms that neither another instance of the app
+            // nor user interventions on the folder itself have happened.  Depending on what these are, _folderAppSettings ID
+            // is either a folder ID or the word none, we are looking for none, if not, it aborts after setting the proper buttons.
             await WhatButtons();
             if (_folderAppSettingsID == "none")
             {
@@ -160,46 +165,16 @@ namespace OneDriveAdaptation
                 MakeFolderAppSettings.IsEnabled = false;
                 DeleteFolderAppSettings.IsEnabled = true;
             }
-           // await WhatButtons();
+        
 
         }
 
         private async void DeleteFolderAppSettings_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            /*
-            bool hasFolder = false;
-            //folder Status
-            IChildrenCollectionPage item = null;
-            try
-            {
-                //Checks if approot has children, going to be sprinkling more try and catches around, but this is it for the first release
-                item = await _client.Drive.Special.AppRoot.Children.Request().GetAsync();
-            }
-            catch
-            {
-                hasFolder = false;
-            }
+            // This is the inverse of the MakeFolder method, here it is looking for a folder id.
+            //of note, even if another instance of the app has created this file.
+            // the whatbuttons routine will populate it with the appropriate ID
 
-            if (item.Count == 0)
-            { hasFolder = false; }
-            else
-            {
-                foreach (var entity in item)
-                {
-                    if (entity.Name == "AppSettingsDoNotTouch")
-                    {
-                        //We know the name of the folder, so we are letting the system know they need to offer a delete
-                        hasFolder = true;
-                        _folderAppSettingsID = entity.Id;
-
-                    }
-
-
-
-                }
-
-            }
-            */
             await WhatButtons();
             if (_folderAppSettingsID != "none")
             {
@@ -216,7 +191,7 @@ namespace OneDriveAdaptation
                 DeleteFileAppSettings.IsEnabled = false;
                 DeleteFolderAppSettings.IsEnabled = false;
                 MakeFolderAppSettings.IsEnabled = true;
-                // status2.Text = "EssentialSoftwareProducts Folder deleted in App Root with id of: " + _folderID;
+            
             }
             else
             {
@@ -227,26 +202,26 @@ namespace OneDriveAdaptation
                 MakeFileAppSettings.IsEnabled = false;
                 DeleteFileAppSettings.IsEnabled = false;
                 MakeFolderAppSettings.IsEnabled = true;
-                //status2.Text = "You can create it again though,,,";
+                
             }
 
 
-            //await WhatButtons();
+        
         }
 
         private async void MakeFileAppSettings_Tapped(object sender, TappedRoutedEventArgs e)
         {
+
+            //This routine creates the file by working with windows storage.  I later found that I can do the same thing with a memory stream.
+            // Only doc'ing the code now, but that might be something to update.
             await WhatButtons();
             if (_fileAppSettingsID == "none")
             {
 
                 StorageFile fileToCreate = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync("AppSettings.txt", CreationCollisionOption.ReplaceExisting);
                 await Windows.Storage.FileIO.WriteTextAsync(fileToCreate, "Setting A");
-                //var q = await _client.Drive.Special.AppRoot.ItemWithPath
-                // var file2ToCreate = new Item { Name = "MERDE.TXT", File =  fileToCreate };
 
-                //Windows.Storage.KnownFolders.
-                string q = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\AppSettings.txt";//"\\AppSettings" + annoying++ + ".txt";
+                string q = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\AppSettings.txt";
                 FileStream g = System.IO.File.Open(q, FileMode.OpenOrCreate);
 
 
@@ -260,11 +235,7 @@ namespace OneDriveAdaptation
                     .Content
                     .Request()
                     .PutAsync<Item>(g);
-                // g.Flush();
-                //z.Close();
-
-                // await  fileToCreate.DeleteAsync();
-
+          
 
                 _fileAppSettingsID = item.Id;
                 DeleteFileAppSettings.IsEnabled = true;
@@ -274,12 +245,12 @@ namespace OneDriveAdaptation
 
             }
 
-           // await WhatButtons();
-//
+
         }
 
         private async void DeleteFileAppSettings_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            //similar to delete folder, only used on a file.
             await WhatButtons();
             if (_fileAppSettingsID != "none")
             {
@@ -305,13 +276,15 @@ namespace OneDriveAdaptation
 
         private async void MakeFolderPersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            //This is virtually the same as the make folder for appsettings.  Something that would probably be nice to do
+            // and more proper, to put them in one method, but just pass them a parameter or two.
+
             await WhatButtons();
             if (_folderPersonalFilesID == "none")
             {
                 var folderToCreate = new Item { Name = "PersonalFilesYoursToShare", Folder = new Folder() };
                 var newFolder = await _client.Drive.Special.AppRoot.Children.Request().AddAsync(folderToCreate);
                 status.Text = "The Personal Files folder has been created. ";
-                //status2.Text = "EssentialSoftwareProducts Folder created in App Root with id of: " + newFolder.Id.ToString();
                 _folderPersonalFilesID = newFolder.Id;
                 MakeFolderPersonalFiles.IsEnabled = false;
                 DeleteFolderPersonalFiles.IsEnabled = true;
@@ -326,44 +299,15 @@ namespace OneDriveAdaptation
                 MakeFilePersonalFiles.IsEnabled = true;
 
             }
-            // await WhatButtons();
+         
         }
 
         private async void DeleteFolderPersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            /*
-            bool hasFolder = false;
-            //folder Status
-            IChildrenCollectionPage item = null;
-            try
-            {
-                //Checks if approot has children, going to be sprinkling more try and catches around, but this is it for the first release
-                item = await _client.Drive.Special.AppRoot.Children.Request().GetAsync();
-            }
-            catch
-            {
-                hasFolder = false;
-            }
-
-            if (item.Count == 0)
-            { hasFolder = false; }
-            else
-            {
-                foreach (var entity in item)
-                {
-                    if (entity.Name == "PersonalFilesYoursToShare")
-                    {
-                        //We know the name of the folder, so we are letting the system know they need to offer a delete
-                        hasFolder = true;
-                        _folderPersonalFilesID = entity.Id;
-
-                    }
+           //  Another similar to the DeleteAppSettingsFolder.  Again, this would probably benefit from combining, especially true if you have more than
+           // 2 folders to create or delete.
 
 
-
-                }
-
-            }*/
             await WhatButtons();
 
             if (_folderPersonalFilesID != "none")
@@ -375,12 +319,12 @@ namespace OneDriveAdaptation
                   .DeleteAsync()
                   ;
                 status.Text = "The Personal Files Folder has been deleted,,,,";
-                // status2.Text = "EssentialSoftwareProducts Folder deleted in App Root with id of: " + _folderID;
+                
             }
             else
             {
                 status.Text = "Personal Files Folder Not found, cannot delete!";
-                //status2.Text = "You can create it again though,,,";
+             
             }
 
             await WhatButtons();
@@ -390,15 +334,17 @@ namespace OneDriveAdaptation
         private async void MakeFilePersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
         {
 
+            //same as the MakeFileAppSettings routine, could benefit from,,,,
+
+
             await WhatButtons();
             if (_filePersonalFilesID == "none")
             {
                 StorageFile fileToCreate = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync("PersonalFiles.txt", CreationCollisionOption.ReplaceExisting);
                 await Windows.Storage.FileIO.WriteTextAsync(fileToCreate, "Personal A");
-                //var q = await _client.Drive.Special.AppRoot.ItemWithPath
-                // var file2ToCreate = new Item { Name = "MERDE.TXT", File =  fileToCreate };
+               
 
-                //Windows.Storage.KnownFolders.
+                
                 string q = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\PersonalFiles.txt";
                 FileStream g = System.IO.File.Open(q, FileMode.Open);
 
@@ -429,11 +375,14 @@ namespace OneDriveAdaptation
                 UpdatePersonalFiles.IsEnabled = false;
                 ReadPersonalFiles.IsEnabled =  false;
             }
-           // await WhatButtons();
+          
         }
 
         private async void DeleteFilePersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
         {
+
+            //This routine has a bug in it, it should also reset Read and Update Personal Files to disabled.
+
             await WhatButtons();
             if (_filePersonalFilesID != "none")
             {
@@ -449,7 +398,7 @@ namespace OneDriveAdaptation
                 DeleteFilePersonalFiles.IsEnabled = true;
                 MakeFilePersonalFiles.IsEnabled = false;
             }
-           // await WhatButtons();
+         
 
         }
         private async void ReadPersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
@@ -483,6 +432,9 @@ namespace OneDriveAdaptation
 
         private async void UpdatePersonalFiles_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            //These Update Methods use the memory stream, I want to look into this further.
+            //This actually may be propogated to more areas when I put this in Essential Grocer App.
+
             await WhatButtons();
 
             if (_filePersonalFilesID != "none")
@@ -604,7 +556,7 @@ namespace OneDriveAdaptation
     "App Setting");
                 await AppSettingDialog.ShowAsync();
             }
-           // await WhatButtons();
+          
         }
 
         private async void ReadAppSettings_Tapped(object sender, TappedRoutedEventArgs e)
@@ -637,6 +589,9 @@ namespace OneDriveAdaptation
 
 
         }
+
+        //this is collapse all, should be disable all.  In an earlier incarnation it was actually
+        //collapsing everything, in the latest version they are still visible, just disabled.
         private void Collapse_All()
         {
             MakeFolderAppSettings.IsEnabled = false;
@@ -655,13 +610,23 @@ namespace OneDriveAdaptation
 
         }
 
+
+        //This is a long one, but it represents how this program operates Multi-Client.  A very important ingredient,
+        // and the whole point of working with OneDrive.
+
         private async Task<int> WhatButtons()
         {
-            Collapse_All();
+            Collapse_All();  // Start with all buttons disabled.
+
+            //First volley set the booleans so we will know if the folders exist.
+
             bool hasFolderAppSettings = false;
             bool hasFolderPersonalFiles = false;
             //folder Status
 
+            //These are all my id flags, these are globals.  The default "none" signals to the rest of the 
+            //program that they can write these objects, when they have a oneDrive ID, it signals
+            //that they can be built upon, read or updated.
             _fileAppSettingsID = "none";
             _filePersonalFilesID = "none";
             _folderAppSettingsID = "none";
@@ -674,6 +639,7 @@ namespace OneDriveAdaptation
             }
             catch
             {
+                //if we got nothing, set it  up to build the folders.
                 hasFolderAppSettings = false;
                 hasFolderPersonalFiles = false;
                 MakeFolderAppSettings.IsEnabled = true;
@@ -692,6 +658,11 @@ namespace OneDriveAdaptation
             }
             else
             {
+
+                //This is another area with some stuff hardcoded, like folder and later file names.
+                //Going forward this should be getting this info from a config of some sort.
+                //Or it could just be globals with the names, so you would change them at 
+                //the top of the program and it would propogate.
                 foreach (var entity in item)
                 {
                     if (entity.Name == "AppSettingsDoNotTouch")
@@ -721,7 +692,7 @@ namespace OneDriveAdaptation
             status2.Text = "";
 
 
-
+            //This is a path for the AppSettings folder, another redundency that could be handled more for the generic.
 
             if (hasFolderAppSettings)
             {
@@ -748,6 +719,10 @@ namespace OneDriveAdaptation
 
 
                 }
+
+                 //Once we know it has children, then check the name (Generic?)
+                 //This is required, in case someone/something else write to the folder.  
+                 //We are only interested in our file.
                 if (hasAppChildren)
                 {
                     if (AppChildren.Count > 0)
@@ -817,7 +792,7 @@ namespace OneDriveAdaptation
             }
 
 
-
+            //this is the redundent for Personal Files, same drill,,,
             if (hasFolderPersonalFiles)
             {
 
